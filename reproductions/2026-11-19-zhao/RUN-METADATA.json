@@ -6,19 +6,38 @@
     "kernel": "6.6.95.bck.4-rc5-amd64",
     "python": "3.12.11",
     "ran_utc": "2026-11-19T10:34:30Z",
-    "method": "local checkout, per REPRODUCE.md, no virtualenv, no packages installed"
+    "method": "three local checkouts in /tmp, per REPRODUCE.md, no virtualenv, no packages installed",
+    "working_directory": "The last two commands were run from /tmp/wexp-check. That is not incidental: the driver line passes '.' as the baseline checkout and the two /tmp paths as the reference trees, so the working directory has to be the wexp-check checkout and the other two clones have to sit at /tmp/wexp-ref and /tmp/wexp-vectors for the recorded command to resolve."
   },
   "pins": {
     "WEXP-dev/wexp-check": "cfe458b5f90c0a95ad1723b7a0dbba1b8d834fae",
     "WEXP-dev/wexp-ref": "56289024c9ee748111f1f1d4f42728ffe04d8d69",
     "WEXP-dev/wexp-vectors": "edd67056873502a2c3cecf5dd2b8db71271c2f57"
   },
-  "commands": [
+  "commands_as_run": [
     "git clone https://github.com/WEXP-dev/wexp-check.git",
     "git clone https://github.com/WEXP-dev/wexp-ref.git && git -C wexp-ref checkout 56289024c9ee748111f1f1d4f42728ffe04d8d69",
     "git clone https://github.com/WEXP-dev/wexp-vectors.git && git -C wexp-vectors checkout edd67056873502a2c3cecf5dd2b8db71271c2f57",
     "python3 -B -m unittest discover -s tests",
     "PYTHONPATH=. python3 -B scripts/compare_corpora.py --baseline comparison.json . /tmp/wexp-ref /tmp/out_comparison.json /tmp/wexp-vectors/vectors/WEXP-CORE-02-VECTORS-001/corpus.json /tmp/wexp-vectors/vectors/WEXP-CORE-02-VECTORS-002/corpus.json"
+  ],
+  "commands_as_run_notes": [
+    "These are the commands as typed, in the order typed, with the clones made inside /tmp so that the two /tmp reference paths in line 5 resolve; line 5 was run from /tmp/wexp-check.",
+    "Line 1 does no checkout: wexp-check was cloned at the default branch, whose head was cfe458b5 on 2026-11-19, and that head is what the pin above records. No explicit checkout of wexp-check was run.",
+    "Lines 4 and 5 are the ones whose output is recorded in 'results'."
+  ],
+  "commands_for_a_replay": [
+    "mkdir -p /tmp/wexp-replay && cd /tmp/wexp-replay",
+    "git clone https://github.com/WEXP-dev/wexp-check.git && git -C wexp-check checkout cfe458b5f90c0a95ad1723b7a0dbba1b8d834fae",
+    "git clone https://github.com/WEXP-dev/wexp-ref.git && git -C wexp-ref checkout 56289024c9ee748111f1f1d4f42728ffe04d8d69",
+    "git clone https://github.com/WEXP-dev/wexp-vectors.git && git -C wexp-vectors checkout edd67056873502a2c3cecf5dd2b8db71271c2f57",
+    "cd wexp-check && python3 -B -m unittest discover -s tests",
+    "PYTHONPATH=. python3 -B scripts/compare_corpora.py --baseline comparison.json . /tmp/wexp-replay/wexp-ref /tmp/wexp-replay-out.json /tmp/wexp-replay/wexp-vectors/vectors/WEXP-CORE-02-VECTORS-001/corpus.json /tmp/wexp-replay/wexp-vectors/vectors/WEXP-CORE-02-VECTORS-002/corpus.json"
+  ],
+  "commands_for_a_replay_notes": [
+    "These are instructions for someone repeating the run elsewhere, not commands I ran. In particular the explicit 'git -C wexp-check checkout <sha>' in the second line is a replay step: my run cloned at the default head and did not check anything out.",
+    "They differ from the run in two ways on purpose: an explicit working directory at the start, and explicit ../wexp-ref style absolute paths for the reference trees, so the block can be pasted and expect to work from a clean shell.",
+    "The paths inside 'commands_for_a_replay' are illustrative; a replay's output will differ in the paths it prints, which is why the row-level comparison, not the file hash, is the check that matters."
   ],
   "results": {
     "unit_tests": "Ran 37 tests in 0.629s - OK",
@@ -32,12 +51,12 @@
     "comparison.json": {
       "bytes": 20046,
       "sha256": "eaa7775c714f1b4fbc6b120b8b4fb5501a146d6b7030ffca60738a52741bdbe4",
-      "source": "output of the command above, unedited; it records absolute checkout paths on this machine"
+      "source": "Output of the driver line above, unedited. Its 'engines' block records the engine modules as resolved inside each checkout - 'wexp_check/__init__.py' and 'wexp_ref/core02/appraiser.py' - so those are module-relative paths, not checkout directories, and they will read the same on any machine. The absolute import paths, the ones that carry this machine's /tmp layout, are printed to stdout only and are not stored in the file. The 'python' field records the interpreter patch level, 3.12.11 here against 3.12.13 in the repository copy."
     },
     "README.md": {
-      "bytes": 2503,
-      "sha256": "40740c0a8f4b7f217aeae92345108ecfbdaa3889f92740b8b276ccf6f213a33b",
-      "source": "written for this record"
+      "bytes": 3336,
+      "sha256": "f7d8e9475ed30d48b092d9b735e2d96e79b9b631b1cc5a9c2607ba8373a0363c",
+      "source": "written for this record; revised 2026-11-24 after the maintainer's review to state the working directory and the engine-path wording"
     }
   },
   "limits": [

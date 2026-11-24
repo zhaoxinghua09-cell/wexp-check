@@ -24,7 +24,9 @@ Machine: cloud Linux host, Python 3.12.11, no virtualenv, nothing installed beyo
 | driver exit status | `0`, with `--baseline comparison.json` |
 | row-level comparison | every row of both sets identical to `comparison.json` |
 
-`comparison.json` in this directory is the unedited output of the run. It differs from this repository's copy only in the `engines` block and the Python patch level (`3.12.11` here, `3.12.13` there).
+`comparison.json` in this directory is the unedited output of the run. It differs from this repository's copy only in the `engines` block and the Python patch level (`3.12.11` here, `3.12.13` there). Its `engines` block records engine modules, not checkout directories (`wexp_check/__init__.py`, `wexp_ref/core02/appraiser.py`), so those values are the same on any machine; the absolute import paths that carry this run's `/tmp` layout were printed to stdout and are not stored in the file.
+
+The three checkouts were made inside `/tmp`, and the last two commands were run from `/tmp/wexp-check`: the driver line passes `.` as the baseline checkout and `/tmp/wexp-ref` and `/tmp/wexp-vectors` as the reference trees, so that working directory is what the recorded line resolves against. `RUN-METADATA.json` separates the commands as typed from a spelled-out replay block, because the two are not the same thing: the replay block adds the `cd` and an explicit `git -C wexp-check checkout cfe458b5…`, neither of which was in the run.
 
 ## What was not done
 
